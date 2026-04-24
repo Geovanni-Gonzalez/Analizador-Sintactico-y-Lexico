@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.github.vbmacher</groupId>
             <artifactId>java-cup-runtime</artifactId>
-            <version>11b-20160615</version>
+            <version>11b</version>
         </dependency>
     </dependencies>
 
@@ -30,9 +30,7 @@
                 <version>1.9.1</version>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
+                        <goals><goal>generate</goal></goals>
                         <configuration>
                             <outputDirectory>src/main/java</outputDirectory>
                             <lexDefinitions>
@@ -44,19 +42,19 @@
             </plugin>
 
             <plugin>
-                <groupId>com.github.vbmacher</groupId>
+                <groupId>net.sf.squirrel-sql</groupId>
                 <artifactId>java-cup-maven-plugin</artifactId>
-                <version>11b-20160615</version>
+                <version>0.11adaliab-4</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
+                            <cupDefinition>src/main/cup/sintactico.cup</cupDefinition>
                             <outputDirectory>src/main/java</outputDirectory>
                             <className>Parser</className>
                             <symbolsName>sym</symbolsName>
-                            <cupDefinition>src/main/cup/sintactico.cup</cupDefinition>
                         </configuration>
                     </execution>
                 </executions>

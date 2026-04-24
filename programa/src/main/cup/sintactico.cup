@@ -1,0 +1,8 @@
+package cr.ac.itcr;
+import java-cup.runtime.*;
+
+terminal SEPARATOR, ASSIGN, END_EXPR, INT, ID, INT_LIT;
+non terminal programa;
+
+start with programa;
+programa ::= ID ;
