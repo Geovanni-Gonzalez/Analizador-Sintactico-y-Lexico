@@ -1,8 +1,84 @@
 package cr.ac.itcr;
-import java-cup.runtime.*;
+import java_cup.runtime.*;
 
-terminal SEPARATOR, ASSIGN, END_EXPR, INT, ID, INT_LIT;
+parser code {:
+    public void report_error(String message, Object info) {
+        StringBuilder sb = new StringBuilder("Error Sintáctico");
+        if (info instanceof Symbol) {
+            Symbol s = (Symbol) info;
+            if (s.left >= 0)  sb.append(" en línea ").append(s.left + 1);
+            if (s.right >= 0) sb.append(", columna ").append(s.right + 1);
+        }
+        sb.append(": ").append(message);
+        System.err.println(sb.toString());
+    }
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        throw new RuntimeException("Error fatal en el parser");
+    }
+:};
+
+/* Terminales con valor */
+terminal String    ID;
+terminal Integer   LIT_ENTERO;
+terminal Double    LIT_FLOTANTE;
+terminal String    LIT_FRACCION;
+terminal String    LIT_EXPONENTE;
+terminal Character LIT_CHAR;
+terminal String    LIT_STRING;
+terminal Boolean   TRUE, FALSE;
+
+/* Terminales sin valor */
+terminal INT, FLOAT, BOOL, CHAR_TYPE, STRING;
+terminal IF, ELSE, DO, WHILE, SWITCH, CASE, DEFAULT;
+terminal CIN, COUT;
+terminal RETURN, BREAK, EMPTY, MAIN;
+terminal GREATHER_T, LESS_T, GREATHER_TE, LESS_TE, EQUAL_OP, N_EQUAL;
+terminal ASSIGN;
+terminal L_BLOCK, R_BLOCK;
+terminal L_ARRAY_ACCESS, R_ARRAY_ACCESS;
+terminal L_PAREN, R_PAREN;
+terminal SEPARATOR, END_EXPR, COMMA;
+terminal PLUS, MINUS, TIMES, DIV, MOD, POW;
+terminal AND_LOG, OR_LOG;
+terminal INC, DEC, DEREF;
+terminal UMINUS;
+
+/* No terminales */
 non terminal programa;
+non terminal main;
+non terminal bloque, lista_sentencias, item;
+non terminal sentencia_simple;
+non terminal tipo;
+
+precedence left  OR_LOG;
+precedence left  AND_LOG;
+precedence left  PLUS, MINUS;
+precedence left  TIMES, DIV, MOD;
+precedence right POW;
+precedence right UMINUS;
+precedence right ELSE;
 
 start with programa;
-programa ::= ID ;
+
+programa ::= main
+           ;
+
+main ::= EMPTY SEPARATOR MAIN L_PAREN R_PAREN bloque
+       ;
+
+bloque ::= L_BLOCK lista_sentencias R_BLOCK
+         ;
+
+lista_sentencias ::= lista_sentencias item
+                   | item
+                   ;
+
+item ::= sentencia_simple END_EXPR
+       ;
+
+sentencia_simple ::= ID
+                   ;
+
+tipo ::= INT | FLOAT | BOOL | CHAR_TYPE | STRING
+       ;
