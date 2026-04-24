@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.github.vbmacher</groupId>
             <artifactId>java-cup-runtime</artifactId>
-            <version>${java-cup.version}</version>
+            <version>11b-20160615</version>
         </dependency>
     </dependencies>
     <build>
@@ -29,7 +29,6 @@
                 <version>${jflex.version}</version>
                 <executions>
                     <execution>
-                        <id>generate-lexer</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -44,8 +43,8 @@
             </plugin>
             <plugin>
                 <groupId>com.github.vbmacher</groupId>
-                <artifactId>cup-maven-plugin</artifactId> 
-                <version>${java-cup.version}</version>
+                <artifactId>java-cup-maven-plugin</artifactId>
+                <version>11b-20160615</version>
                 <executions>
                     <execution>
                         <id>generate-parser</id>
@@ -53,10 +52,9 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/generated-sources/cup</outputDirectory>
+                            <outputDirectory>src/main/java</outputDirectory>
                             <className>Parser</className>
                             <symbolsName>sym</symbolsName>
-                            <cupDefinition>src/main/cup/sintactico.cup</cupDefinition>
                         </configuration>
                     </execution>
                 </executions>
