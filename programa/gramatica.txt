@@ -1,0 +1,137 @@
+<tipo> ::= "int"|"float"|"bool"|"char"|"string"
+
+<tipoArreglo> ::= "int"|"float"
+
+<entero> ::= "-"? <enteroPos> | <digito>
+
+<enteroPos> ::= <positivo> <digito>*
+
+<flotante> ::= <entero> "." <digito>+
+
+<fraccion> ::= <entero> "/" <enteroPos>
+
+<exponente> ::= <entero> "e" <enteroPos>
+
+<booleano> ::= "true"|"false"
+
+<caracter> ::= (<digito>)|(<letra>) | "_"
+
+<char> ::= "'" <caracter> "'"
+
+<chars> ::= <caracter>+
+
+<string> ::= '"' <chars>? '"'
+
+<digito> ::= [0-9]
+
+<positivo> ::= [1-9]
+
+<letra> ::= [a-zA-Z]
+
+<id> ::= (<letra> | "_") (<letra> | <digito> | "_")*
+
+<constructorArreglo> ::= <tipoArreglo> "~" <id>  "|:" <enteroPos> "," <enteroPos> ":|"
+
+<constructorArregloAsig> ::= <constructorArreglo>  "<-"  <filasArreglo> 
+
+<filasArreglo> ::= <filaArreglo>+
+
+<filaArreglo> ::= <filaEnteros> | <filaFlotantes>
+
+<filaEnteros> ::= "|:" <entero> (","<entero>)* ":|"
+
+<filaFlotantes> ::= "|:" <flotante> (","<flotante>)* ":|"
+
+<accesoArreglo> ::= <id>  "<<" <entero> "," <entero> ">>"
+
+<arregloAsig> ::= <accesoArreglo> "<-" <expr>
+
+<constructorVariable> ::= <tipo>"~"<id>
+
+<constructor> ::= <constructorVariable> | <constructorArreglo>
+
+<constructorAsig> ::= <constructorVariable> "<-" <expr> | <constructorArregloAsig>
+
+<asignacion>   ::= <id> "<-" <expr> | <arregloAsig>
+
+<expr> ::= <exprLog>
+
+<exprLog> ::= <exprRel> ( <opLog> <exprRel> )*
+
+<opLog> ::= ("@" | "#")
+
+<exprRel> ::= <opRel> "<|" <expr> "," <expr> "|>" | <exprArit>
+
+<opRel> ::= "greather_t" | "less_t" | "greather_te" | "less_te" | "equal" | "n_equal"
+
+<exprArit> ::= <termino> ( <opArit> <termino> )*
+
+<opArit> ::= ("+" | "-")
+
+<termino> ::= <potencia> ( <opTermino> <potencia> )*
+
+<opTermino> ::= ("*" | "/" | "%" )
+
+<potencia> ::= <factor> "^" <potencia> | <factor>
+
+<opPotencia> ::= "^"
+
+<factor> ::= "-" <factor> | "++" <id> | "--" <id> | "$" <id> | <base>
+
+<base> ::= <entero> | <flotante> | <fraccion> | <exponente> | <booleano> | <char> | <string> | <id> | <accesoArreglo> | <llamadaFunc> | "<|" <expr> "|>"
+
+<listaSentencias> ::= <item>+
+
+<item> ::= <sentenciaSimple> "!" | <control>
+
+<sentenciaSimple> ::= <constructor> | <constructorAsig> | <asignacion> | <expr> | <io> | <retorno> | <break> | <comentario>
+
+<control> ::= <ifElse> | <doWhile> | <switch>
+
+<ifElse> ::= "if" "<|" <expr> "|>" <bloque>  | "if" "<|" <expr> "|>" <bloque> "else" <bloque>
+
+<doWhile> ::= "do" <bloque> "while" "<|" <expr> "|>"
+
+<switch> ::= "switch" "<|" <expr> "|>" "|:" <casos> ":|"
+
+<casos> ::= <caso>+
+
+<caso> ::= "case" <entero> "~" <bloque> | "default" "~" <bloque>
+
+<bloque> ::= "|:" <listaSentencias> ":|"
+
+<io> ::= <lectura> | <escritura>
+
+<lectura> ::= "cin" "~" <id>
+
+<escritura> ::= "cout" "~" <salida>
+
+<salida> ::= <expr> | <expr> "," <salida>
+
+<funcion> ::= <tipoRetorno> "~" <id> "<|" <parametros> "|>" <bloque>
+
+<funciones> ::= <funcion>+
+
+<tipoRetorno> ::= "int" | "float" | "bool" | "char"
+
+<parametros> ::= <param> ("," <param>)* | 
+
+<param> ::= <tipo> "~" <id>
+
+<llamadaFunc> ::= <id> "<|" <args> "|>"
+
+<args> ::= <expr> ("," <expr>)* | 
+
+<main> ::= "empty" "~" "__main__" "<|" "|>" <bloque>
+
+<programa> ::= <funciones>? <main> <funciones>?
+
+<comentario> ::= <comentarioLinea> | <comentarioMulti>
+
+<comentarioLinea> ::= "¡¡" <chars>
+
+<comentarioMulti> ::= "{-" <chars> "-}"
+
+<retorno> ::= "return" "~" <expr>
+
+<break> ::= "break"
