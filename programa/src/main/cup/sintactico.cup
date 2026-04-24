@@ -50,6 +50,10 @@ non terminal main;
 non terminal bloque, lista_sentencias, item;
 non terminal sentencia_simple;
 non terminal tipo;
+non terminal control;
+non terminal if_else, do_while, switch_stmt;
+non terminal casos, caso;
+non terminal retorno, break_stmt;
 
 precedence left  OR_LOG;
 precedence left  AND_LOG;
@@ -75,10 +79,28 @@ lista_sentencias ::= lista_sentencias item
                    ;
 
 item ::= sentencia_simple END_EXPR
+        | control
        ;
 
 sentencia_simple ::= ID
                    ;
+
+
+control    ::= if_else | do_while | switch_stmt ;
+
+
+if_else    ::= IF L_PAREN expr R_PAREN bloque ELSE bloque
+             | IF L_PAREN expr R_PAREN bloque %prec ELSE ;
+
+do_while   ::= DO bloque WHILE L_PAREN expr R_PAREN ;
+
+switch_stmt ::= SWITCH L_PAREN expr R_PAREN L_BLOCK casos R_BLOCK ;
+casos      ::= casos caso | caso ;
+caso       ::= CASE entero SEPARATOR bloque
+             | DEFAULT SEPARATOR bloque ;
+
+retorno    ::= RETURN SEPARATOR expr ;
+break_stmt ::= BREAK ;
 
 tipo ::= INT | FLOAT | BOOL | CHAR_TYPE | STRING
        ;
