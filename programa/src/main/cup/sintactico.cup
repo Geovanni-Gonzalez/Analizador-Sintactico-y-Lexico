@@ -54,6 +54,14 @@ non terminal control;
 non terminal if_else, do_while, switch_stmt;
 non terminal casos, caso;
 non terminal retorno, break_stmt;
+non terminal funciones, funcion, tipo_retorno;
+non terminal parametros, lista_params, param;
+non terminal constructor_arreglo, constructor_arreglo_asig;
+non terminal filas_arreglo, fila_arreglo;
+non terminal fila_enteros, lista_enteros;
+non terminal fila_flotantes, lista_flotantes;
+non terminal arreglo_asig, acceso_arreglo;
+
 
 precedence left  OR_LOG;
 precedence left  AND_LOG;
@@ -65,11 +73,32 @@ precedence right ELSE;
 
 start with programa;
 
-programa ::= main
+programa ::= funciones main funciones
+           | funciones main | main funciones | main ;
            ;
-
 main ::= EMPTY SEPARATOR MAIN L_PAREN R_PAREN bloque
        ;
+funciones ::= funciones funcion | funcion ;
+funcion   ::= tipo_retorno SEPARATOR ID L_PAREN parametros R_PAREN bloque ;
+tipo_retorno ::= INT | FLOAT | BOOL | CHAR_TYPE ;
+
+constructor_arreglo ::= INT   SEPARATOR ID L_BLOCK entero_pos COMMA entero_pos R_BLOCK
+                      | FLOAT SEPARATOR ID L_BLOCK entero_pos COMMA entero_pos R_BLOCK ;
+
+parametros  ::= lista_params | ;
+lista_params ::= lista_params COMMA param | param ;
+param       ::= tipo SEPARATOR ID ;
+
+constructor_arreglo_asig ::= constructor_arreglo ASSIGN filas_arreglo ;
+filas_arreglo ::= filas_arreglo fila_arreglo | fila_arreglo ;
+fila_arreglo  ::= fila_enteros | fila_flotantes ;
+fila_enteros  ::= L_BLOCK entero lista_enteros R_BLOCK ;
+lista_enteros ::= lista_enteros COMMA entero | ;
+fila_flotantes ::= L_BLOCK LIT_FLOTANTE lista_flotantes R_BLOCK ;
+lista_flotantes ::= lista_flotantes COMMA LIT_FLOTANTE | ;
+
+acceso_arreglo ::= ID L_ARRAY_ACCESS entero COMMA entero R_ARRAY_ACCESS ;
+arreglo_asig   ::= acceso_arreglo ASSIGN expr ;
 
 bloque ::= L_BLOCK lista_sentencias R_BLOCK
          ;
@@ -82,8 +111,17 @@ item ::= sentencia_simple END_EXPR
         | control
        ;
 
-sentencia_simple ::= ID
+sentencia_simple ::= constructor_asig | constructor_arreglo_asig
+                   | constructor_variable | constructor_arreglo
+                   | asignacion | arreglo_asig
+                   | expr | io | retorno | break_stmt ;
                    ;
+
+base ::= entero | LIT_FLOTANTE | LIT_FRACCION | LIT_EXPONENTE
+       | TRUE | FALSE | LIT_CHAR | LIT_STRING
+       | ID L_PAREN args R_PAREN | ID
+       | acceso_arreglo
+       | L_PAREN expr R_PAREN ;
 
 
 control    ::= if_else | do_while | switch_stmt ;
