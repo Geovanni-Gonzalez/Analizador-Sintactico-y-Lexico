@@ -1,0 +1,31 @@
+# Compilados de Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# VS Code
+.vscode/
+bin/
+.settings/
+.classpath
+.project
+
+# Archivos de salida del sistema (Reportes de tokens)
+# Solo ignorar si quieres que cada integrante los genere localmente
+# tokens_reporte.txt
+
+# OS específicos
+.DS_Store
+Thumbs.db

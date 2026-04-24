@@ -1,4 +1,4 @@
-package main;
+package main.cup;
 // Crear el archivo de salida solicitado
 PrintWriter writer = new PrintWriter(new FileWriter("tokens_reporte.txt"));
 Symbol token;
