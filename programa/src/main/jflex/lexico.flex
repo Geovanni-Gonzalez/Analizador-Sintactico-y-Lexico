@@ -8,6 +8,14 @@
 ":|"        { return symbol(sym.R_BLOCK, "R_BLOCK"); }
 
 
+[0-9]+  {
+    return new Symbol(sym.NUMBER,
+        yyline + 1,   //Symbol.left
+        yycolumn + 1, //Symbol.right
+        Integer.parseInt(yytext())
+    );
+}
+
 /* Regla "comodín" para capturar cualquier carácter no reconocido */
 [^] { 
     // Reportar el error indicando la línea fundamental [cite: 210]
