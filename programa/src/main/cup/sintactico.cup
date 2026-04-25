@@ -2,6 +2,16 @@ package cr.ac.itcr;
 import java_cup.runtime.*;
 
 parser code {:
+    public int numErrores = 0;
+
+    public void syntax_error(Symbol token) {
+        System.err.println("Error sintáctico en línea "
+            + token.left
+            + ", columna "
+            + token.right
+            + ": token no reconocido '"'
+            + token.value + '"');
+    }
     public void report_error(String message, Object info) {
         StringBuilder sb = new StringBuilder("Error Sintáctico");
         if (info instanceof Symbol) {
@@ -14,7 +24,12 @@ parser code {:
     }
     public void report_fatal_error(String message, Object info) {
         report_error(message, info);
-        throw new RuntimeException("Error fatal en el parser");
+        throw new RuntimeException("Error fatal en el parser");  
+    }
+    public void unrecovered_syntax_error(Symbol token) {
+        System.err.println("Error irrecuperable no se puede recuperar. "
+            + "Línea: " + token.left);
+        System.exit(1);
     }
 :};
 
@@ -61,8 +76,15 @@ non terminal filas_arreglo, fila_arreglo;
 non terminal fila_enteros, lista_enteros;
 non terminal fila_flotantes, lista_flotantes;
 non terminal arreglo_asig, acceso_arreglo;
+non terminal expr, expr_log, expr_rel, expr_arit;
+non terminal termino, potencia, factor, base;
+non terminal op_rel, op_log, op_arit, op_termino;
+non terminal entero, entero_pos;
+non terminal llamada_func, args, lista_args;
+non terminal constructor_variable, constructor_asig, asignacion;
+non terminal io, lectura, escritura, salida;
 
-
+precedence left  GREATHER_T, LESS_T, GREATHER_TE, LESS_TE, EQUAL_OP, N_EQUAL;
 precedence left  OR_LOG;
 precedence left  AND_LOG;
 precedence left  PLUS, MINUS;
@@ -74,7 +96,11 @@ precedence right ELSE;
 start with programa;
 
 programa ::= funciones main funciones
-           | funciones main | main funciones | main ;
+           | funciones main
+           | main funciones
+           | main
+           | error
+             {: parser.report_error("Error grave en la estructura del programa", null); :}
            ;
 main ::= EMPTY SEPARATOR MAIN L_PAREN R_PAREN bloque
        ;
@@ -86,11 +112,19 @@ constructor_arreglo ::= INT   SEPARATOR ID L_BLOCK entero_pos COMMA entero_pos R
                       | FLOAT SEPARATOR ID L_BLOCK entero_pos COMMA entero_pos R_BLOCK ;
 
 parametros  ::= lista_params | ;
-lista_params ::= lista_params COMMA param | param ;
+lista_params ::= lista_params COMMA param
+               | param
+               | lista_params COMMA error
+                 {: parser.report_error("Parámetro inválido en declaración de función", null); :}
+               ;
 param       ::= tipo SEPARATOR ID ;
 
 constructor_arreglo_asig ::= constructor_arreglo ASSIGN filas_arreglo ;
-filas_arreglo ::= filas_arreglo fila_arreglo | fila_arreglo ;
+filas_arreglo ::= filas_arreglo fila_arreglo
+                | fila_arreglo
+                | filas_arreglo error
+                  {: parser.report_error("Fila de arreglo inválida, se omite", null); :}
+                ;
 fila_arreglo  ::= fila_enteros | fila_flotantes ;
 fila_enteros  ::= L_BLOCK entero lista_enteros R_BLOCK ;
 lista_enteros ::= lista_enteros COMMA entero | ;
@@ -108,14 +142,15 @@ lista_sentencias ::= lista_sentencias item
                    ;
 
 item ::= sentencia_simple END_EXPR
-        | control
+       | control
+       | error END_EXPR          /* se consume hasta el siguiente '!' */
+         {: parser.report_error("Sentencia inválida, se omite hasta '!'", null); :}
        ;
 
 sentencia_simple ::= constructor_asig | constructor_arreglo_asig
                    | constructor_variable | constructor_arreglo
                    | asignacion | arreglo_asig
                    | expr | io | retorno | break_stmt ;
-                   ;
 
 base ::= entero | LIT_FLOTANTE | LIT_FRACCION | LIT_EXPONENTE
        | TRUE | FALSE | LIT_CHAR | LIT_STRING
@@ -133,12 +168,105 @@ if_else    ::= IF L_PAREN expr R_PAREN bloque ELSE bloque
 do_while   ::= DO bloque WHILE L_PAREN expr R_PAREN ;
 
 switch_stmt ::= SWITCH L_PAREN expr R_PAREN L_BLOCK casos R_BLOCK ;
-casos      ::= casos caso | caso ;
+casos ::= casos caso
+        | caso
+        | casos error
+          {: parser.report_error("Caso inválido en switch, se omite", null); :}
+        ;
 caso       ::= CASE entero SEPARATOR bloque
              | DEFAULT SEPARATOR bloque ;
 
 retorno    ::= RETURN SEPARATOR expr ;
 break_stmt ::= BREAK ;
 
-tipo ::= INT | FLOAT | BOOL | CHAR_TYPE | STRING
-       ;
+tipo ::= INT | FLOAT | BOOL | CHAR_TYPE | STRING;
+
+expr ::= expr_log;
+
+expr_log ::= expr_log AND_LOG expr_rel
+        | expr_log OR_LOG expr_rel
+        | expr_rel
+        ;
+
+expr_rel ::= op_rel L_PAREN expr COMMA expr R_PAREN
+        | expr_arit
+        ;
+
+op_rel ::= GREATHER_T
+        | LESS_T
+        | GREATHER_TE
+        | LESS_TE
+        | EQUAL_OP
+        | N_EQUAL
+        ;
+
+expr_arit ::= expr_arit PLUS termino
+        | expr_arit MINUS termino
+        | termino
+        ;
+
+termino ::= termino TIMES potencia
+        | termino DIV potencia
+        | termino MOD potencia
+        | potencia
+        ;
+
+potencia ::= factor POW potencia
+        | factor
+        ;
+
+factor ::= MINUS factor %prec UMINUS
+        | INC ID 
+        | DEC ID 
+        | DEREF ID 
+        | base
+        ;
+
+base ::= entero
+        | LIT_FLOTANTE
+        | LIT_FRACCION
+        | LIT_EXPONENTE
+        | TRUE
+        | FALSE
+        | LIT_CHAR
+        | LIT_STRING
+        | llamada_func
+        | acceso_arreglo
+        | ID
+        | L_PAREN expr R_PAREN
+        ;
+
+entero ::= MINUS entero_pos
+        | entero_pos
+        | LIT_ENTERO
+        ;
+
+entero_pos ::= LIT_ENTERO;
+
+llamada_func ::= ID L_PAREN args R_PAREN;
+
+args ::= lista_args;
+
+lista_args ::= lista_args COMMA expr
+             | expr
+             | lista_args COMMA error
+               {: parser.report_error("Argumento inválido en llamada a función", null); :}
+             ;
+constructor_variable ::= tipo SEPARATOR ID ;
+
+constructor_asig ::= constructor_variable ASSIGN expr | constructor_arreglo_asig;
+
+asignacion ::= ID ASSIGN expr
+            | arreglo_asig
+            ;
+
+
+io ::= lectura | escritura;
+
+lectura ::= CIN SEPARATOR ID;
+
+escritura ::= COUT SEPARATOR salida;
+
+salida ::= salida COMMA expr
+        | expr
+        ;
