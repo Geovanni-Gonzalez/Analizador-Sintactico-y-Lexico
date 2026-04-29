@@ -2,10 +2,25 @@ import java_cup.runtime.*;
 
 /* CODIGO */
 parser code {:
+    public int numErrores = 0;
+
     public void syntax_error(Symbol s) {
+        numErrores++;
+        String token = s.value != null ? "'" + s.value + "'" : "token desconocido";
         System.err.println("Error sintáctico en línea " + s.left +
                            ", columna " + s.right +
-                           ": token '" + s.value + "'");
+                           ": token inesperado " + token);
+    }
+
+    public void unrecovered_syntax_error(Symbol s) {
+        numErrores++;
+        if (s.left == -1) {
+            System.err.println("Error irrecuperable: se llegó al final del archivo sin poder recuperarse.");
+        } else {
+            System.err.println("Error irrecuperable en línea " + s.left +
+                               ", columna " + s.right +
+                               ": el análisis no puede continuar.");
+        }
     }
 :};
 
@@ -91,7 +106,9 @@ funciones_opt ::= funciones
 funciones ::= funciones funcion
             | funcion ;
 
-funcion ::= tipoRetorno SEPARATOR ID L_PAREN parametros R_PAREN bloque ;
+funcion ::= tipoRetorno SEPARATOR ID L_PAREN parametros R_PAREN bloque
+          | error R_BLOCK  /* recuperacion: funcion mal formada, sincroniza en :| */
+          ;
 
 tipoRetorno ::= INT | FLOAT | BOOL | CHAR_TYPE | STRING_TYPE ;
 
@@ -105,13 +122,17 @@ param ::= tipoRetorno SEPARATOR ID ;
 
 /* BLOQUES */
 
-bloque ::= L_BLOCK listaSentencias R_BLOCK ;
+bloque ::= L_BLOCK listaSentencias R_BLOCK
+         | L_BLOCK error R_BLOCK  /* recuperacion: bloque con contenido invalido */
+         ;
 
 listaSentencias ::= listaSentencias item
                   | item ;
 
 item ::= sentenciaSimple END_EXPR
-       | control ;
+       | control
+       | error END_EXPR  /* recuperacion: sentencia invalida, sincroniza en ! */
+       ;
 
 /* SENTENCIAS */
 
@@ -138,7 +159,9 @@ declArrTail ::= ASSIGN filasArreglo
 filasArreglo ::= filasArreglo filaArreglo
                | filaArreglo ;
 
-filaArreglo ::= L_BLOCK lista_args R_BLOCK ;
+filaArreglo ::= L_BLOCK lista_args R_BLOCK
+              | L_BLOCK error R_BLOCK  /* recuperacion: fila de arreglo invalida */
+              ;
 
 /* ASIGNACIÓN */
 
@@ -214,11 +237,17 @@ control ::= ifElse
           | switch_stmt ;
 
 ifElse ::= IF L_PAREN expr R_PAREN bloque
-         | IF L_PAREN expr R_PAREN bloque ELSE bloque ;
+         | IF L_PAREN expr R_PAREN bloque ELSE bloque
+         | IF L_PAREN error R_PAREN bloque           /* recuperacion: condicion invalida en if */
+         | IF L_PAREN error R_PAREN bloque ELSE bloque ;
 
-doWhile ::= DO bloque WHILE L_PAREN expr R_PAREN ;
+doWhile ::= DO bloque WHILE L_PAREN expr R_PAREN
+          | DO bloque WHILE L_PAREN error R_PAREN  /* recuperacion: condicion invalida en while */
+          ;
 
-switch_stmt ::= SWITCH L_PAREN expr R_PAREN L_BLOCK casos R_BLOCK ;
+switch_stmt ::= SWITCH L_PAREN expr R_PAREN L_BLOCK casos R_BLOCK
+              | SWITCH L_PAREN error R_PAREN L_BLOCK casos R_BLOCK  /* recuperacion: expr invalida en switch */
+              ;
 
 break_stmt ::= BREAK ;
 
@@ -226,7 +255,9 @@ casos ::= casos caso
         | caso ;
 
 caso ::= CASE LIT_ENTERO SEPARATOR bloque
-       | DEFAULT SEPARATOR bloque ;
+       | DEFAULT SEPARATOR bloque
+       | CASE error SEPARATOR bloque  /* recuperacion: etiqueta de case invalida */
+       ;
 
 /* IO */
 
