@@ -1,0 +1,19 @@
+Tokens Encontrados:
+-------------------------------------------------------------------------------------------------------------------
+Token                | Lexema                    | Tabla de Símbolos    | Información a Almacenar
+-------------------------------------------------------------------------------------------------------------------
+EMPTY                | 'empty'                   | No aplica            | Ninguna
+SEPARATOR            | '~'                       | No aplica            | Ninguna
+MAIN                 | '__main__'                | No aplica            | Ninguna
+L_BLOCK              | '|:'                      | No aplica            | Ninguna
+INT                  | 'int'                     | No aplica            | Ninguna
+SEPARATOR            | '~'                       | No aplica            | Ninguna
+ID                   | 'var'                     | Tabla de Símbolos    | Nombre, Tipo, Ámbito, Dirección Memoria
+ASSIGN               | '<-'                      | No aplica            | Ninguna
+LIT_ENTERO           | '10'                      | Tabla de Literales   | Valor, Tipo
+END_EXPR             | '!'                       | No aplica            | Ninguna
+COUT                 | 'cout'                    | No aplica            | Ninguna
+SEPARATOR            | '~'                       | No aplica            | Ninguna
+LIT_STRING           | '"Hola Mundo"'            | Tabla de Literales   | Valor, Tipo
+END_EXPR             | '!'                       | No aplica            | Ninguna
+R_BLOCK              | ':|'                      | No aplica            | Ninguna

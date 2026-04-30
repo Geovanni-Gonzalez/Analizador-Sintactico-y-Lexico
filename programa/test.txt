@@ -1,0 +1,4 @@
+empty ~ __main__() |:
+    int ~ var <- 10 !
+    cout ~ "Hola Mundo" !
+:|
