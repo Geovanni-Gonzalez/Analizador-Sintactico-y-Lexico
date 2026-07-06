@@ -41,24 +41,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>com.github.vbmacher</groupId>
-                <artifactId>java-cup-maven-plugin</artifactId>
-                <version>11b-20160615</version>
-                <executions>
-                    <execution>
-                        <id>generate-parser</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>src/main/java</outputDirectory>
-                            <className>Parser</className>
-                            <symbolsName>sym</symbolsName>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- parser.java and sym.java are versioned outputs from CUP. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -102,7 +85,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>main.java.Main</mainClass>
+                                    <mainClass>Main</mainClass>
                                 </transformer>
                             </transformers>
                             <createDependencyReducedPom>false</createDependencyReducedPom>

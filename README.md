@@ -70,3 +70,4 @@ GitHub: [Geovanni-Gonzalez](https://github.com/Geovanni-Gonzalez)
 
 
 
+![CI](https://github.com/Geovanni-Gonzalez/Analizador-Sintactico-y-Lexico/actions/workflows/ci.yml/badge.svg)

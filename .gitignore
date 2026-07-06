@@ -29,3 +29,22 @@ bin/
 # OS específicos
 .DS_Store
 Thumbs.db
+# Java / Maven / Gradle
+build/
+out/
+*.iml
+.gradle/
+# Local agent/editor state
+.claude/
+CLAUDE.md
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+# OS/editor noise
+desktop.ini
+.idea/
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
