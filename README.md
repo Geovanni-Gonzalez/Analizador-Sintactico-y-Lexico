@@ -1,4 +1,6 @@
-﻿# Analizador Sintáctico y Léxico
+# Analizador Sintáctico y Léxico
+
+> **Serie Compiladores — Parte 1 de 3.** Front-end léxico-sintáctico del lenguaje `.chip`. Continúa en [Parte 2: Análisis Semántico y Código Intermedio](https://github.com/Geovanni-Gonzalez/Analisis-Semantico-y-Generacion-de-Codigo-Intermedio) y culmina en [Parte 3: Generación de Código MIPS](https://github.com/Geovanni-Gonzalez/Generacion-Codigo-Destino-MIPS) (backend completo, 36 tests).
 
 ## Descripción
 Proyecto Java/Maven para analizar un lenguaje mediante JFlex y CUP. Incluye gramática, archivo de prueba y documentación.
